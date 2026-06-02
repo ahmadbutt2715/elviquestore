@@ -1,0 +1,177 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #ffffff;
+  --foreground: #1f1f1f;
+  --google-blue: #1a73e8;
+  --google-blue-hover: #1557b0;
+  --google-blue-light: #e8f0fe;
+  --gray-50: #f8f9fa;
+  --gray-100: #f1f3f4;
+  --gray-150: #f1f3f4;
+  --gray-200: #e8eaed;
+  --gray-300: #dadce0;
+  --gray-400: #bdc1c6;
+  --gray-500: #9aa0a6;
+  --gray-600: #70757a;
+  --gray-700: #5f6368;
+  --gray-750: #4e5256;
+  --gray-800: #3c4043;
+  --gray-850: #2c2e30;
+  --gray-900: #202124;
+  --gray-950: #0c0d0e;
+  --font-outfit: var(--font-outfit);
+  --font-inter: var(--font-inter);
+}
+
+.dark {
+  --background: #080e1a;
+  --foreground: #f8fafc;
+  --google-blue: #8ab4f8;
+  --google-blue-hover: #aecbfa;
+  --google-blue-light: #162a45;
+  --gray-50: #0e1726;
+  --gray-100: #121e33;
+  --gray-150: #1a2c4c;
+  --gray-200: #1e293b;
+  --gray-300: #334155;
+  --gray-400: #475569;
+  --gray-500: #94a3b8;
+  --gray-600: #cbd5e1;
+  --gray-700: #e2e8f0;
+  --gray-750: #cbd5e1;
+  --gray-800: #f1f5f9;
+  --gray-850: #1e293b;
+  --gray-900: #f8fafc;
+  --gray-950: #ffffff;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-google-blue: var(--google-blue);
+  --color-google-blue-hover: var(--google-blue-hover);
+  --color-google-blue-light: var(--google-blue-light);
+  --color-gray-50: var(--gray-50);
+  --color-gray-100: var(--gray-100);
+  --color-gray-150: var(--gray-150);
+  --color-gray-200: var(--gray-200);
+  --color-gray-300: var(--gray-300);
+  --color-gray-400: var(--gray-400);
+  --color-gray-500: var(--gray-500);
+  --color-gray-600: var(--gray-600);
+  --color-gray-700: var(--gray-700);
+  --color-gray-750: var(--gray-750);
+  --color-gray-800: var(--gray-800);
+  --color-gray-850: var(--gray-850);
+  --color-gray-900: var(--gray-900);
+  --color-gray-950: var(--gray-950);
+  --font-sans: var(--font-inter), sans-serif;
+  --font-display: var(--font-outfit), sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Material Design style scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gray-300);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-400);
+}
+
+/* Glassmorphism utilities */
+.google-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.dark .google-card {
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.google-shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+}
+
+.google-shadow-md {
+  box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+}
+
+.google-shadow-lg {
+  box-shadow: 0 4px 6px 0 rgba(60,64,67,0.3), 0 8px 24px 6px rgba(60,64,67,0.15);
+}
+
+.dark .google-shadow-sm {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.dark .google-shadow-md {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+}
+
+.dark .google-shadow-lg {
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+}
+
+/* Active navigation indicators */
+.active-nav-pill {
+  background-color: var(--google-blue-light);
+  color: var(--google-blue);
+  font-weight: 500;
+}
+
+/* Custom micro-animations */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
