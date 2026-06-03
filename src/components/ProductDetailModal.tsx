@@ -118,8 +118,9 @@ const ProductDetailModalContent: React.FC = () => {
         </div>
 
         {/* Product Information details - Right Col */}
-        <div className="w-full md:w-1/2 p-6 md:p-8 overflow-y-auto flex flex-col justify-between max-h-[60vh] md:max-h-[85vh]">
-          <div>
+        <div className="w-full md:w-1/2 flex flex-col max-h-[60vh] md:max-h-[85vh] overflow-hidden">
+          {/* Scrollable details */}
+          <div className="p-6 md:p-8 overflow-y-auto flex-grow">
             {/* Category */}
             <span className="text-xs font-semibold text-google-blue bg-google-blue-light px-3 py-1 rounded-full uppercase tracking-wider">
               {product.category}
@@ -206,12 +207,28 @@ const ProductDetailModalContent: React.FC = () => {
                 ))}
               </div>
             </div>
+
+            {/* Guarantee / Value props badges */}
+            <div className="grid grid-cols-3 gap-2 text-[10px] text-gray-500 mt-6 pt-4 border-t border-gray-100 text-center">
+              <div className="flex flex-col items-center gap-1">
+                <Truck className="w-4 h-4 text-google-blue" />
+                <span className="font-semibold">Free Delivery</span>
+              </div>
+              <div className="flex flex-col items-center gap-1">
+                <ShieldCheck className="w-4 h-4 text-google-blue" />
+                <span className="font-semibold">2-Year Warranty</span>
+              </div>
+              <div className="flex flex-col items-center gap-1">
+                <RefreshCw className="w-4 h-4 text-google-blue" />
+                <span className="font-semibold">30-Day Returns</span>
+              </div>
+            </div>
           </div>
 
-          {/* Checkout triggers and cart modifier controls */}
-          <div className="mt-8 border-t border-gray-100 pt-6 space-y-5">
+          {/* Checkout triggers and cart modifier controls (Fixed/Sticky footer) */}
+          <div className="border-t border-gray-100 p-4 md:p-6 bg-background space-y-4 flex-shrink-0">
             {/* Quantity Selector */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
                 Quantity
               </span>
@@ -235,11 +252,11 @@ const ProductDetailModalContent: React.FC = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row items-center gap-3">
+            <div className="flex flex-row items-center gap-3">
               {/* Add to Cart button */}
               <button
                 onClick={handleAddToCart}
-                className="w-full sm:flex-grow sm:flex-1 px-6 py-3.5 bg-google-blue-light hover:bg-google-blue text-google-blue hover:text-white dark:bg-google-blue-light/10 dark:text-google-blue dark:hover:bg-google-blue text-xs font-bold rounded-full shadow-xs flex items-center justify-center gap-2 cursor-pointer transition-all"
+                className="w-1/2 px-4 py-3 bg-google-blue-light hover:bg-google-blue text-google-blue hover:text-white dark:bg-google-blue-light/10 dark:text-google-blue dark:hover:bg-google-blue text-xs font-bold rounded-full shadow-xs flex items-center justify-center gap-2 cursor-pointer transition-all"
               >
                 <ShoppingCart className="w-4 h-4" />
                 Add to Cart
@@ -248,26 +265,10 @@ const ProductDetailModalContent: React.FC = () => {
               {/* Order Now button */}
               <button
                 onClick={handleOrderNow}
-                className="w-full sm:flex-grow sm:flex-1 px-8 py-3.5 bg-google-blue hover:bg-google-blue-hover text-white text-xs font-bold rounded-full shadow-sm hover:shadow flex items-center justify-center gap-2 cursor-pointer transition-all"
+                className="w-1/2 px-4 py-3 bg-google-blue hover:bg-google-blue-hover text-white text-xs font-bold rounded-full shadow-sm hover:shadow flex items-center justify-center gap-2 cursor-pointer transition-all"
               >
                 Order Now
               </button>
-            </div>
-          </div>
-
-          {/* Guarantee / Value props badges */}
-          <div className="grid grid-cols-3 gap-2 text-[10px] text-gray-500 mt-6 pt-4 border-t border-gray-100 text-center">
-            <div className="flex flex-col items-center gap-1">
-              <Truck className="w-4 h-4 text-google-blue" />
-              <span className="font-semibold">Free Delivery</span>
-            </div>
-            <div className="flex flex-col items-center gap-1">
-              <ShieldCheck className="w-4 h-4 text-google-blue" />
-              <span className="font-semibold">2-Year Warranty</span>
-            </div>
-            <div className="flex flex-col items-center gap-1">
-              <RefreshCw className="w-4 h-4 text-google-blue" />
-              <span className="font-semibold">30-Day Returns</span>
             </div>
           </div>
         </div>

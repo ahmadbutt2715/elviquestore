@@ -12,11 +12,13 @@ export default function CheckoutPage() {
 
   // Form states
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [zip, setZip] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"cod" | "card">("cod");
   const [cardNum, setCardNum] = useState("");
   const [cardExpiry, setCardExpiry] = useState("");
   const [cardCvv, setCardCvv] = useState("");
@@ -28,7 +30,7 @@ export default function CheckoutPage() {
   const [errorMsg, setErrorMsg] = useState("");
 
   // Calculate pricing
-  const SHIPPING_COST = cartTotal >= 40000 ? 0 : 1500;
+  const SHIPPING_COST = cartTotal >= 40000 ? 0 : 150;
   const ORDER_TOTAL = cartTotal + SHIPPING_COST;
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -38,26 +40,66 @@ export default function CheckoutPage() {
     // Simple fields validation
     if (
       !email ||
+      !phone ||
       !firstName ||
       !lastName ||
       !address ||
       !city ||
-      !zip ||
-      !cardNum ||
-      !cardExpiry ||
-      !cardCvv
+      !zip
     ) {
-      setErrorMsg("Please fill in all checkout fields.");
+      setErrorMsg("Please fill in all contact and shipping fields.");
       return;
     }
 
-    // Trigger mock checkout process
+    if (paymentMethod === "card" && (!cardNum || !cardExpiry || !cardCvv)) {
+      setErrorMsg("Please fill in your credit card details.");
+      return;
+    }
+
+    // Trigger order placement process
     setIsSubmitting(true);
-    setTimeout(() => {
+
+    const productString = cart.map(item => `${item.product.title} (${item.selectedVariant.title}) x${item.quantity}`).join(", ");
+    const totalQty = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const orderIdTemp = `ELV-${Math.floor(100000 + Math.random() * 900000)}`;
+
+    fetch("/api/checkout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        orderId: orderIdTemp,
+        customerName: `${firstName} ${lastName}`,
+        phone,
+        email,
+        address,
+        city,
+        zipCode: zip,
+        product: productString,
+        qty: totalQty,
+        price1Unit: cart.map(item => item.selectedVariant.price).join(", "),
+        subtotal: cartTotal,
+        shippingFee: SHIPPING_COST,
+        grandTotal: ORDER_TOTAL,
+      })
+    })
+    .then(async (res) => {
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to process order.");
+      }
+      return data;
+    })
+    .then((data) => {
       setIsSubmitting(false);
       setCheckoutStep("success");
-      setOrderNumber(`ELV-${Math.floor(100000 + Math.random() * 900000)}`);
-    }, 2800); // 2.8 seconds checkout authorization animation
+      setOrderNumber(orderIdTemp);
+    })
+    .catch((err) => {
+      setIsSubmitting(false);
+      setErrorMsg(err.message || "An unexpected error occurred. Please try again.");
+    });
   };
 
   const handleReturnHome = () => {
@@ -153,17 +195,31 @@ export default function CheckoutPage() {
           {/* Contact Details */}
           <div>
             <h2 className="font-display text-base font-bold text-gray-900 mb-4">Contact Information</h2>
-            <div>
-              <label htmlFor="email" className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Email Address</label>
-              <input
-                type="email"
-                id="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-google-blue focus:border-google-blue transition-all"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="email" className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Email Address</label>
+                <input
+                  type="email"
+                  id="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-google-blue focus:border-google-blue transition-all"
+                />
+              </div>
+              <div>
+                <label htmlFor="phone" className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Phone Number</label>
+                <input
+                  type="tel"
+                  id="phone"
+                  required
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+92 300 1234567"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-google-blue focus:border-google-blue transition-all"
+                />
+              </div>
             </div>
           </div>
 
@@ -234,55 +290,91 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* Secure Payment details */}
+          {/* Payment Method details */}
           <div className="border-t border-gray-100 pt-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display text-base font-bold text-gray-900">Payment Information</h2>
-              <span className="flex items-center gap-1 text-[10px] text-gray-400 font-semibold uppercase">
-                <CreditCard className="w-3.5 h-3.5 text-google-blue" /> Secure SSL
-              </span>
+            <h2 className="font-display text-base font-bold text-gray-900 mb-4">Payment Method</h2>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+              <button
+                type="button"
+                onClick={() => setPaymentMethod("cod")}
+                className={`p-4 rounded-2xl border text-left transition-all flex flex-col justify-between cursor-pointer h-24 ${
+                  paymentMethod === "cod"
+                    ? "border-google-blue bg-google-blue-light/5 text-google-blue"
+                    : "border-gray-200 hover:border-gray-300 text-gray-600 bg-gray-50/50"
+                }`}
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span className="text-xs font-bold uppercase tracking-wider">Cash on Delivery</span>
+                  <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${paymentMethod === "cod" ? "border-google-blue" : "border-gray-300"}`}>
+                    {paymentMethod === "cod" && <div className="w-2.5 h-2.5 rounded-full bg-google-blue" />}
+                  </div>
+                </div>
+                <span className="text-[10px] text-gray-500 leading-normal">Pay with cash when your package is delivered to your doorstep.</span>
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => setPaymentMethod("card")}
+                className={`p-4 rounded-2xl border text-left transition-all flex flex-col justify-between cursor-pointer h-24 ${
+                  paymentMethod === "card"
+                    ? "border-google-blue bg-google-blue-light/5 text-google-blue"
+                    : "border-gray-200 hover:border-gray-300 text-gray-600 bg-gray-50/50"
+                }`}
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span className="text-xs font-bold uppercase tracking-wider">Credit Card</span>
+                  <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${paymentMethod === "card" ? "border-google-blue" : "border-gray-300"}`}>
+                    {paymentMethod === "card" && <div className="w-2.5 h-2.5 rounded-full bg-google-blue" />}
+                  </div>
+                </div>
+                <span className="text-[10px] text-gray-500 leading-normal">Test/mock payment. No real credit card will be charged.</span>
+              </button>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="sm:col-span-3">
-                <label htmlFor="cardNum" className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Card Number</label>
-                <input
-                  type="text"
-                  id="cardNum"
-                  required
-                  value={cardNum}
-                  onChange={(e) => setCardNum(e.target.value)}
-                  placeholder="4111 2222 3333 4444"
-                  maxLength={19}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-google-blue focus:border-google-blue transition-all"
-                />
+
+            {paymentMethod === "card" && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border border-gray-100 p-5 rounded-2xl bg-gray-50/50 animate-fade-in">
+                <div className="sm:col-span-3">
+                  <label htmlFor="cardNum" className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Card Number</label>
+                  <input
+                    type="text"
+                    id="cardNum"
+                    required
+                    value={cardNum}
+                    onChange={(e) => setCardNum(e.target.value)}
+                    placeholder="4111 2222 3333 4444"
+                    maxLength={19}
+                    className="w-full px-4 py-3 bg-background border border-gray-200 rounded-2xl text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-google-blue focus:border-google-blue transition-all"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label htmlFor="cardExpiry" className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Expiration Date</label>
+                  <input
+                    type="text"
+                    id="cardExpiry"
+                    required
+                    value={cardExpiry}
+                    onChange={(e) => setCardExpiry(e.target.value)}
+                    placeholder="MM / YY"
+                    maxLength={5}
+                    className="w-full px-4 py-3 bg-background border border-gray-200 rounded-2xl text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-google-blue focus:border-google-blue transition-all"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="cardCvv" className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">CVV</label>
+                  <input
+                    type="password"
+                    id="cardCvv"
+                    required
+                    value={cardCvv}
+                    onChange={(e) => setCardCvv(e.target.value)}
+                    placeholder="123"
+                    maxLength={4}
+                    className="w-full px-4 py-3 bg-background border border-gray-200 rounded-2xl text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-google-blue focus:border-google-blue transition-all"
+                  />
+                </div>
               </div>
-              <div className="sm:col-span-2">
-                <label htmlFor="cardExpiry" className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Expiration Date</label>
-                <input
-                  type="text"
-                  id="cardExpiry"
-                  required
-                  value={cardExpiry}
-                  onChange={(e) => setCardExpiry(e.target.value)}
-                  placeholder="MM / YY"
-                  maxLength={5}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-google-blue focus:border-google-blue transition-all"
-                />
-              </div>
-              <div>
-                <label htmlFor="cardCvv" className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">CVV</label>
-                <input
-                  type="password"
-                  id="cardCvv"
-                  required
-                  value={cardCvv}
-                  onChange={(e) => setCardCvv(e.target.value)}
-                  placeholder="123"
-                  maxLength={4}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-google-blue focus:border-google-blue transition-all"
-                />
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Checkout Submit CTA */}
@@ -294,10 +386,10 @@ export default function CheckoutPage() {
             {isSubmitting ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Authorizing Shopify Payment Gateway...
+                Processing your order...
               </>
             ) : (
-              <>Complete Secure Payment &mdash; Rs. {ORDER_TOTAL.toLocaleString()}</>
+              <>{paymentMethod === "cod" ? "Place Cash on Delivery Order" : "Complete Secure Payment"} &mdash; Rs. {ORDER_TOTAL.toLocaleString()}</>
             )}
           </button>
         </form>
