@@ -53,6 +53,13 @@ export async function POST(request: Request) {
     const webhookUrl = process.env.N8N_WEBHOOK_URL;
 
     if (!webhookUrl) {
+      if (process.env.NODE_ENV === "production") {
+        return NextResponse.json(
+          { success: false, error: "Checkout system configuration error: Webhook URL is missing." },
+          { status: 500 }
+        );
+      }
+      
       console.warn("WARNING: N8N_WEBHOOK_URL is not configured in environment variables. Simulating success in development mode.");
       // In development mode, return mock success to prevent blocking checkout if the webhook is not set up yet
       return NextResponse.json({
