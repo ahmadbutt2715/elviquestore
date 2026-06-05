@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit, Inter } from "next/font/google";
 import { CartProvider } from "@/context/CartContext";
+import Script from "next/script";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -43,6 +44,16 @@ export default function RootLayout({
         <CartProvider>
           {children}
         </CartProvider>
+        
+        {/* Botpress Webchat Integration */}
+        <Script 
+          src="https://cdn.botpress.cloud/webchat/v3.6/inject.js" 
+          strategy="afterInteractive" 
+        />
+        <Script 
+          src="https://files.bpcontent.cloud/2026/06/03/09/20260603092426-OBXIMET7.js" 
+          strategy="afterInteractive" 
+        />
       </body>
     </html>
   );
