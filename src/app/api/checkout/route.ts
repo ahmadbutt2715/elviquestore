@@ -44,7 +44,7 @@ export async function POST(request: Request) {
       "Shipping Fee": shippingFee,
       "Grand Total": grandTotal,
       "Status": "In Process",
-      "Processing email": "Sent",
+      "Processing email": "Not Sent",
       "Confirm email": "Not Sent",
       "Out for Delivery email": "Not Sent",
       "Delivered email": "Not Sent",
