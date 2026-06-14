@@ -47,7 +47,8 @@ export async function POST(request: Request) {
       "Processing email": "Sent",
       "Confirm email": "Not Sent",
       "Out for Delivery email": "Not Sent",
-      "Delivered email": "Not Sent"
+      "Delivered email": "Not Sent",
+      "Cancel email": "Not Sent"
     };
 
     const webhookUrl = process.env.N8N_WEBHOOK_URL;
