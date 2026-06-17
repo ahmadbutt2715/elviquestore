@@ -20,7 +20,7 @@ const payload = {
   "Cancel email": "Not Sent"
 };
 
-const webhookUrl = "https://ahmadbutt3256.app.n8n.cloud/webhook-test/8cb2a17a-91e7-47ff-ad91-dbe7c33ad217";
+const webhookUrl = "https://elvique.app.n8n.cloud/webhook/8cb2a17a-91e7-47ff-ad91-dbe7c33ad217";
 
 console.log("Sending test payload to n8n webhook...");
 console.log(JSON.stringify(payload, null, 2));
